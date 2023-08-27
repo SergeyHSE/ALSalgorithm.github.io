@@ -1,1 +1,1 @@
-# ALSalgorithm.github.io
+In this repository, our goal is to find similar movies and users with respect to given characteristics. For this purpose, we will use the ALS algorithm. In addition, we will implement mse, NDCG metric counting and see what is the impact of the dimensionality of hidden views on the performance of the algorithm.
