@@ -5,10 +5,10 @@ Created on Tue Aug  8 19:53:38 2023
 @author: SergeyHSE
 """
 #############################################################################################
-# In this work, we will find similar movies and users using the ALS algorithm,
-# implement the calculation of the NDCG metric, and investigate
-# the effect of the dimensionality of hidden representations on the performance of the algorithm.
-# Dataset = MovieLens
+#    In this work, we will find similar movies and users using the ALS algorithm,
+#    implement the calculation of the NDCG metric, and investigate
+#    the effect of the dimensionality of hidden representations on the performance of the algorithm.
+#    Dataset = MovieLens
 #############################################################################################
 
 
@@ -470,7 +470,7 @@ def NDCG_k(scores, k, ideal_scores=None):
 
 print('Answer for third qustion:', NDCG_k(scores, k=5))
 
-#Calculate DCG and NDCG on all train and test data
+# Calculate DCG and NDCG on all our train and test data
 
 predictions.shape
 predictions = predictions.T
@@ -504,7 +504,7 @@ for query_scores in predictions:
 average_ndcg = np.mean(ndcg_scores)
 print("Average NDCG:", average_ndcg)
 
-#predictions figure
+#Now let's build predictions figure for fun
 
 import matplotlib.colors as mcolors
 
@@ -518,3 +518,5 @@ plt.title('Prediction astimates', fontsize=18)
 plt.xlabel('Users', fontsize=18)
 plt.ylabel('Movies', fontsize=18)
 plt.show()
+
+# We see seek correlation between first 600 users and movies, but then this picture change and it very intresting.
