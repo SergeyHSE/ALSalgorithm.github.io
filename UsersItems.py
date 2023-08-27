@@ -21,7 +21,9 @@ import pandas as pd
 
 #Let's unpack the data and see how it's organized.
 
-path = r"C:\Users\User\Documents\pyton-projects\spider\Машинное обучение\Recomendation systems\Homework_recom_syst\ml-1m.zip"
+
+path = r"Your path.zip"
+#If you use Linux we shouldn't apply 'replace'
 path = path.replace('\\', '/')
 
 with zipfile.ZipFile(path, "r") as z:
@@ -119,24 +121,33 @@ train_by_item = defaultdict(list)
 for u, i, r in train:
     train_by_item[i].append((u, r))
 
+#Let's count the number of users and movies
+
 n_users = max([e[0] for e in train]) + 1
 n_items = max([e[1] for e in train]) + 1
 n_users
 n_items
 
-%%time
-# Реализация ALS
+################################################
+#                     ALS
+################################################
 np.random.seed(0)
 LATENT_SIZE = 10
 N_ITER = 20
 
-# регуляризаторы
+# regularizers
 lambda_p = 0.2
 lambda_q = 0.001
 
-# латентные представления
+# latent representations
 p = 0.1 * np.random.random((n_users, LATENT_SIZE))
 q = 0.1 * np.random.random((n_items, LATENT_SIZE))
+
+#Now let us compose a matrix P from vectors p_u and a matrix Q from vectors q_i .
+#By matrix Q(see 'FormulaQ.jpg' in files of this repository)  we denote the submatrix of matrix Q only for goods evaluated by user u ,
+#where n_u is the number of evaluations of user u .
+#The reconfiguration step pu for a fixed matrix Q reduces to ridge regression tuning and looks like this:
+#See 'FormulaRidge.jpg
 
 def compute_p(p, q, train_by_user):
     for u, rated in train_by_user.items():
@@ -190,6 +201,8 @@ print(found_movie)
 p.shape
 q.shape
 
+#Let's calculate the scalar product of its embedding with the rest of the movie
+
 from sklearn.metrics.pairwise import cosine_similarity
 
 movie_cos_simiraity = cosine_similarity(q)
@@ -210,6 +223,8 @@ for i in range(1, first_movies + 1):
 answer1 = sum(cosine[:3])
 print(answer1)
 
+#found names all similar movies
+
 found_mov = None
 for movie_id, movie_info in movies.items():
     if movie_id == 260:
@@ -224,7 +239,8 @@ for movie_id, movie_info in movies.items():
     elif movie_id == 1196:
         found_mov = {movie_id: movie_info}
         print(found_mov)
-
+    
+#Let's build correlation matrix
 
 import matplotlib.pyplot as plt
 
@@ -240,6 +256,8 @@ cbar = ax.figure.colorbar(heatmap, ax=ax)
 cbar.ax.set_ylabel('Correlation', rotation=-90, va="bottom", fontsize=18)
 plt.title('Correlation between ITEM and ITEM', fontsize=18)
 plt.show()
+
+#See picture 'correlation.png'
 
 #Find film with minimum correlation movies
 
@@ -348,9 +366,12 @@ for movie_id, movie_info in movies.items():
 
 print(found_movi)
 
+# We end up with several similar movies, one of which is not similar in title to "Star Wars...."
+# but has more in common than a movie that came out a few decades later
+
 ######################################################################
-#  2Calculate number of estemated movies for two similar users,
-#where one of them have the id=5472 
+#  Calculate number of estemated movies for two similar users,
+#           where one of them have the id=5472 
 ######################################################################
 
 users[5472]
@@ -392,6 +413,7 @@ for id_one, number_of_rate in ratings.items():
 print('Total number of watched movies:', count_oneuser+count_twouser)
 
 #Build correlation matrix
+
 np_user = np.corrcoef(np.array(user_cosine_sim))
 np_user = pd.DataFrame(np_user)
 
@@ -404,13 +426,24 @@ cbar = ax.figure.colorbar(heatmap, ax=ax)
 cbar.ax.set_ylabel('Correlation', rotation=-90, va="bottom", fontsize=18)
 plt.title('Correlation between USER and USER', fontsize=18)
 plt.show()
+# See 'correlation_users.png'
 
-#relizing DCG and NDSG metrics
+# If we compare both pictures (correlation matrices) with each other,
+#we can see that the users' matrix is smoother. It can be assumed that this is due to the big difference between
+#the movies, but it is not obvious. Perhaps it is due to the weak dispersion of the scores.
+#The point is that users are initially represented with similar characteristics,
+#which gives a weak variance in the correlation matrix, while movies already have unique features.
+
+################################################################
+#               relizing DCG and NDSG metrics
+################################################################
 
 predictions = p.dot(q.T)
 predictions.shape
 prep = predictions[1]
 prep.shape
+
+#Firstly let's calculate DCG for a litle random list of numbers and see how it works
 
 scores = [5, 5, 4, 5, 2, 4, 5, 3, 5, 5, 2, 3, 0, 0, 1, 2, 2, 3, 0]
 scores = np.array(scores)
